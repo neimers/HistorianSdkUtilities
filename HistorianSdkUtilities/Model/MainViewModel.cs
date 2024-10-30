@@ -62,7 +62,7 @@ namespace HistorianSdkUtilities.Model
                 Settings.Default.HistorianPort = _port;
                 Settings.Default.Save();
             }
-            catch(Exception ex)
+            catch
             {
 
             }            
@@ -95,8 +95,9 @@ namespace HistorianSdkUtilities.Model
             set
             {
                 _tagConfig = value;
-                //LaunchUpdateTagWindowCommand.RaiseCanExecuteChanged();
-                OnPropertyChanged();
+                
+                OnPropertyChanged();                
+                OnPropertyChanged("IsLaunchTagWindowButtonEnabled");
             }
         }
         private InterfaceGroupConfig? _selectedInterfaceGroupConfig;
@@ -120,7 +121,9 @@ namespace HistorianSdkUtilities.Model
             }
             set
             {
-                _selectedInterfaceConfig = value; OnPropertyChanged();
+                _selectedInterfaceConfig = value; 
+                OnPropertyChanged();
+                OnPropertyChanged("IsTagFetchButtonEnabled");
             }
         }        
 
@@ -248,6 +251,22 @@ namespace HistorianSdkUtilities.Model
             } 
         }
 
+        public bool IsTagFetchButtonEnabled
+        {
+            get
+            {
+                return IsButtonsEnabled && (InterfaceConfigs != null && InterfaceConfigs.Count > 0);
+            }
+        }
+
+        public bool IsLaunchTagWindowButtonEnabled
+        {
+            get
+            {
+                return IsButtonsEnabled && SelectedTagConfig != null;
+            }
+        }
+
         private bool _isTestConnectPending;
         public bool IsTestConnectPending 
         {
@@ -259,6 +278,8 @@ namespace HistorianSdkUtilities.Model
                     _isTestConnectPending = value;
                     OnPropertyChanged();
                     OnPropertyChanged("IsButtonsEnabled");
+                    OnPropertyChanged("IsTagFetchButtonEnabled");
+                    OnPropertyChanged("IsLaunchTagWindowButtonEnabled");
                 }
             }
         }
@@ -274,6 +295,8 @@ namespace HistorianSdkUtilities.Model
                     _isTagFetchPending = value;
                     OnPropertyChanged();
                     OnPropertyChanged("IsButtonsEnabled");
+                    OnPropertyChanged("IsTagFetchButtonEnabled");
+                    OnPropertyChanged("IsLaunchTagWindowButtonEnabled");
                 }
             }
         }        

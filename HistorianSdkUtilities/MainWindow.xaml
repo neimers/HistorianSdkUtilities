@@ -75,8 +75,8 @@
             </Grid.ColumnDefinitions>
             <!-- <TextBlock Text="Tag Filter: " TextAlignment="Right" VerticalAlignment="Center" Margin="3"/> -->
             <!--<TextBox Grid.Column="1" Padding="5" TextAlignment="Left" VerticalAlignment="Center" Margin="3" Text="{Binding Path=TagFilter}" Style="{DynamicResource RoundTextBox}"/>  -->
-            <Button x:Name="btnFindTags" Grid.Column="0" Content="Fetch Tags for Interface" Margin="5" Padding="3" Style="{DynamicResource RoundButton}" Click="btnFindTags_Click" IsEnabled="{Binding IsButtonsEnabled}"/>
-            <Button x:Name="btnLoadTagWindow" Grid.Column="1" Content="Read/Update Selected Tag" Margin="5" Padding="3" Style="{DynamicResource RoundButton}" Click="btnLoadTagWindow_Click" IsEnabled="{Binding IsButtonsEnabled}"/>
+            <Button x:Name="btnFindTags" Grid.Column="0" Content="Fetch Tags for Interface" Margin="5" Padding="3" Style="{DynamicResource RoundButton}" Click="btnFindTags_Click" IsEnabled="{Binding IsTagFetchButtonEnabled}"/>
+            <Button x:Name="btnLoadTagWindow" Grid.Column="1" Content="Read/Update Selected Tag" Margin="5" Padding="3" Style="{DynamicResource RoundButton}" Click="btnLoadTagWindow_Click" IsEnabled="{Binding IsLaunchTagWindowButtonEnabled}"/>
         </Grid>
 
         <Grid Grid.Row="3">
