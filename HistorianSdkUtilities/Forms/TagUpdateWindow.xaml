@@ -1,0 +1,188 @@
+﻿<Window xmlns:c1="http://schemas.componentone.com/winfx/2006/xaml"  x:Class="HistorianSdkUtilities.Forms.TagUpdateWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:HistorianSdkUtilities.Model"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance d:Type=local:TagUpdateViewModel, IsDesignTimeCreatable=True}"
+        Title="Tag Read/Update" Height="450" Width="800">
+    <Window.Resources>
+        <Style TargetType="Button" x:Key="RoundButton">
+            <Style.Resources>
+                <Style TargetType="Border">
+                    <Setter Property="CornerRadius" Value="5" />
+                    <Setter Property="MinHeight" Value="35" />
+                </Style>
+            </Style.Resources>
+        </Style>
+        <Style TargetType="TextBox" x:Key="RoundTextBox">
+            <Style.Resources>
+                <Style TargetType="Border">
+                    <Setter Property="CornerRadius" Value="5" />
+                </Style>
+            </Style.Resources>
+        </Style>
+    </Window.Resources>
+    
+    <Grid>
+        <Grid.ColumnDefinitions>
+            
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="8*" />
+        </Grid.RowDefinitions>
+
+        <Border BorderBrush="Black" BorderThickness="0,0,0,1" Margin="3" Padding="3">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto" />
+                    <ColumnDefinition Width="auto" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition Height="auto" />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <TextBlock Text="Tag:" Margin="3" VerticalAlignment="Center" FontWeight="Bold" />
+                <TextBlock Text="ID:" Grid.Row="1" Margin="3" VerticalAlignment="Center" FontWeight="Bold" />
+                <TextBlock Text="Description:" Grid.Row="2" Margin="3" VerticalAlignment="Center" FontWeight="Bold" />
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="3">
+                    <TextBlock  Text="{Binding Tag.InterfaceName}"  TextAlignment="Left" VerticalAlignment="Center"  FontStyle="Italic" />
+                    <TextBlock  Text="." TextAlignment="Left" VerticalAlignment="Center"  FontStyle="Italic" />
+                    <TextBlock  Text="{Binding Tag.Name}"  TextAlignment="Left" VerticalAlignment="Center"  FontStyle="Italic" />
+                </StackPanel>
+
+                <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding Tag.Id}"  TextAlignment="Left" VerticalAlignment="Center" Margin="3" FontStyle="Italic" />
+                <TextBlock Grid.Column="1" Grid.Row="2" Text="{Binding Tag.Description}"  TextAlignment="Left" VerticalAlignment="Center" Margin="3" FontStyle="Italic" />
+            </Grid>
+        </Border>
+        
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition />
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition />
+                <ColumnDefinition Width="auto" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <TextBlock Text="Read Start Time:" VerticalAlignment="Center" Margin="3" FontWeight="Bold" />
+            <c1:C1DateTimePicker Grid.Column="1" Margin="3" DateTime="{Binding ReadStartTime, Mode=TwoWay}" />
+            <TextBlock Grid.Column="2" Text="Read End Time:" VerticalAlignment="Center" Margin="3" FontWeight="Bold" />
+            <c1:C1DateTimePicker Grid.Column="3" Margin="3" DateTime="{Binding ReadEndTime, Mode=TwoWay}"/>
+            <Button x:Name="btnGetValuesForTag" Grid.Column="4" Content="Get Current Data" Margin="3" Style="{DynamicResource RoundButton}" Click="btnGetValuesForTag_Click" IsEnabled="{Binding IsButtonsAreEnabled}" />
+
+            <TextBlock Grid.Row="1" Text="UTC:" TextAlignment="Center" VerticalAlignment="Center" Margin="3" FontWeight="Bold" />
+            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding ReadStartTimeUTC}" TextAlignment="Center" VerticalAlignment="Center" Margin="3" FontWeight="Bold" />
+            <TextBlock Grid.Row="1" Grid.Column="3" Text="{Binding ReadEndTimeUTC}" TextAlignment="Center" VerticalAlignment="Center" Margin="3" FontWeight="Bold" />
+        </Grid>
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
+             
+                
+            <c1:FlexGrid x:Name="fgridTagValues" 
+                         ItemsSource="{Binding TagDataPoints}"
+                         SelectionChanged="fgridTagValues_SelectionChanged"
+                         SelectionMode="Row"
+                         Margin="3"
+                         AutoGenerateColumns="False"     
+                         HeadersVisibility="Column" 
+                         DefaultRowHeight="Auto"             
+                         ColumnHeaderForeground="White" 
+                         ColumnHeaderBackground="Black"
+                >   
+                <c1:FlexGrid.MouseOverBrush>
+                    <SolidColorBrush Color="#FFFFFFFF" Opacity="0.15"/>
+                </c1:FlexGrid.MouseOverBrush>
+                <c1:FlexGrid.GridLinesBrush>
+                    <LinearGradientBrush EndPoint="0.504,1.5" StartPoint="0.504,0.03">
+                        <GradientStop Color="#FFA8A8A8" Offset="0"/>
+                        <GradientStop Color="#FF252525" Offset="0.567"/>
+                    </LinearGradientBrush>
+                </c1:FlexGrid.GridLinesBrush>
+
+                <c1:FlexGrid.Columns>
+
+                    <c1:GridColumn Binding="TimestampLocal" IsReadOnly="True" Width="auto" Header="Timestamp"/>
+                    <c1:GridColumn Binding="TagValueString" IsReadOnly="True" Width="auto"/>
+                    <c1:GridColumn Binding="TagQuality" IsReadOnly="True" Width="auto"/>
+                    <c1:GridColumn Binding="TimestampUTC" IsReadOnly="True" Width="auto" Header="Timestamp (UTC)"/>
+
+                </c1:FlexGrid.Columns>
+                
+            </c1:FlexGrid>
+
+            <Grid Grid.Row="1" HorizontalAlignment="Center">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto" />
+                    <ColumnDefinition Width="auto" />
+                </Grid.ColumnDefinitions>
+                <Button x:Name="btnDeleteSelectedTagValues" Grid.Column="0" Content="Delete Selected Data" Margin="3" Style="{DynamicResource RoundButton}" Click="btnDeleteSelectedTagValues_Click" IsEnabled="{Binding IsButtonsAreEnabled}" />
+                <Button x:Name="btnDeleteTagValuesInTimeRange" Grid.Column="1" Content="Delete Time Range" Margin="3" Style="{DynamicResource RoundButton}"  IsEnabled="{Binding IsButtonsAreEnabled}" Click="btnDeleteTagValuesInTimeRange_Click" />
+            </Grid>
+
+            <Border Grid.Column="1" BorderThickness="1" BorderBrush="Black" Margin="3">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Text="Write Data to Tag" Margin="3" VerticalAlignment="Center" TextAlignment="Center" FontWeight="Bold" />
+                    <StackPanel Grid.Row="1" Orientation="Horizontal">
+
+                    </StackPanel>
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto" />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Text="Timestamp:" Margin="3" VerticalAlignment="Center" FontWeight="Bold"  />
+                        <c1:C1DateTimePicker Grid.Column="3" Margin="3" DateTime="{Binding DataWriteTimestamp, Mode=TwoWay}"/>
+                        
+                        <TextBlock Grid.Row="1" Text="Timestamp (UTC):" Margin="3" VerticalAlignment="Center" FontWeight="Bold"  />
+                        <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding DataWriteTimestampUTC}" TextAlignment="Center" Margin="3" VerticalAlignment="Center" FontWeight="Bold"  />
+
+                        <TextBlock Grid.Row="2" Text="Value:" Margin="3" VerticalAlignment="Center" FontWeight="Bold"  />
+                        <TextBox Grid.Row="2" Grid.Column="1" Padding="5" TextAlignment="Left" VerticalAlignment="Center" Margin="3" Text="{Binding Path=DataWriteValue, UpdateSourceTrigger=PropertyChanged}" Style="{DynamicResource RoundTextBox}" />
+
+                        <TextBlock Grid.Row="3" Text="Quality:" Margin="3" VerticalAlignment="Center" FontWeight="Bold" />
+                        <ComboBox Grid.Row="3" Grid.Column="1" ItemsSource="{Binding QualityOptions}" SelectedValue="{Binding DataWriteQuality, Mode=TwoWay}" Margin="3" VerticalContentAlignment="Center" />
+
+                        <Grid Grid.Row="4" Grid.ColumnSpan="2" HorizontalAlignment="Center">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto" />
+                            </Grid.ColumnDefinitions>
+                            <Button x:Name="btnWriteDataPointToTag" Content="Write Data to Tag" Margin="3" Style="{DynamicResource RoundButton}" Click="btnWriteDataPointToTag_Click" IsEnabled="{Binding IsWriteDataPointButtonEnabled}" />
+                        </Grid>
+                        
+                    </Grid>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>
