@@ -69,7 +69,14 @@ namespace HistorianSdkUtilities.Model
         {
             get
             {
-                return _readEndTime;
+                if (IsReadToNowForEndTime)
+                {
+                    return DateTime.Now;
+                }
+                else
+                {
+                    return _readEndTime;
+                }                
             }
             set
             {
@@ -83,12 +90,7 @@ namespace HistorianSdkUtilities.Model
         {
             get
             {
-                return _readStartTime?.ToUniversalTime();
-            }
-            set
-            {
-                _readStartTime = value;
-                OnPropertyChanged();
+                return ReadStartTime?.ToUniversalTime();
             }
         }
         
@@ -96,7 +98,7 @@ namespace HistorianSdkUtilities.Model
         {
             get
             {
-                return _readEndTime?.ToUniversalTime();
+                return ReadEndTime?.ToUniversalTime();
             }
         }
 
@@ -175,6 +177,34 @@ namespace HistorianSdkUtilities.Model
             }
         }
 
+        private bool _isReadToNowForEndTime;
+        public bool IsReadToNowForEndTime
+        {
+            get
+            {
+                return _isReadToNowForEndTime;
+            }
+            set
+            {
+                if(_isReadToNowForEndTime != value)
+                {
+                    _isReadToNowForEndTime = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged("ReadEndTime");
+                    OnPropertyChanged("ReadEndTimeUTC");
+                    OnPropertyChanged("IsReadEndTimeDatePickerEnabled");
+                }               
+            }
+        }
+
+        public bool IsReadEndTimeDatePickerEnabled
+        {
+            get
+            {
+                return !IsReadToNowForEndTime;
+            }
+        }
+
         private bool _isOperationPending;
         private bool IsOperationPending
         {
@@ -233,6 +263,8 @@ namespace HistorianSdkUtilities.Model
             ReadStartTime = DateTime.Now.Date;
             ReadEndTime = DateTime.Now;
 
+            IsReadToNowForEndTime = true;
+
             selectedTagDataPoints = new ObservableCollection<BindableTagDataPoint>();            
         }
 
@@ -244,6 +276,8 @@ namespace HistorianSdkUtilities.Model
 
             ReadStartTime = DateTime.Now.Date;
             ReadEndTime = DateTime.Now;
+
+            IsReadToNowForEndTime = true;
 
             selectedTagDataPoints = new ObservableCollection<BindableTagDataPoint>();
 
@@ -455,8 +489,7 @@ namespace HistorianSdkUtilities.Model
                     foreach(IDataPoint dp in readRes1.DataPoints)
                     {
                         _tagDataPoints.Add(new BindableTagDataPoint(dp));
-                    }
-                    //_tagDataPoints = new ObservableCollection<IDataPoint>([.. readRes1.DataPoints]);                    
+                    }                  
                 }
                 else
                 {

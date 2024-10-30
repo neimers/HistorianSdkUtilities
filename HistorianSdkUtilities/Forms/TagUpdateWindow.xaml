@@ -75,8 +75,11 @@
             <TextBlock Text="Read Start Time:" VerticalAlignment="Center" Margin="3" FontWeight="Bold" />
             <c1:C1DateTimePicker Grid.Column="1" Margin="3" DateTime="{Binding ReadStartTime, Mode=TwoWay}" />
             <TextBlock Grid.Column="2" Text="Read End Time:" VerticalAlignment="Center" Margin="3" FontWeight="Bold" />
-            <c1:C1DateTimePicker Grid.Column="3" Margin="3" DateTime="{Binding ReadEndTime, Mode=TwoWay}"/>
-            <Button x:Name="btnGetValuesForTag" Grid.Column="4" Content="Get Current Data" Margin="3" Style="{DynamicResource RoundButton}" Click="btnGetValuesForTag_Click" IsEnabled="{Binding IsButtonsAreEnabled}" />
+            <c1:C1DateTimePicker Grid.Column="3" Margin="3" DateTime="{Binding ReadEndTime, Mode=TwoWay}" IsEnabled="{Binding IsReadEndTimeDatePickerEnabled}"/>
+
+            <CheckBox Grid.Row="0" Grid.Column="4" Content="Read To Now" VerticalAlignment="Center" IsChecked="{Binding IsReadToNowForEndTime, Mode=TwoWay}" />
+
+            <Button Grid.Row="1" x:Name="btnGetValuesForTag" Grid.Column="4" Content="Get Current Data" Margin="3" Style="{DynamicResource RoundButton}" Click="btnGetValuesForTag_Click" IsEnabled="{Binding IsButtonsAreEnabled}" />
 
             <TextBlock Grid.Row="1" Text="UTC:" TextAlignment="Center" VerticalAlignment="Center" Margin="3" FontWeight="Bold" />
             <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding ReadStartTimeUTC}" TextAlignment="Center" VerticalAlignment="Center" Margin="3" FontWeight="Bold" />
@@ -91,19 +94,23 @@
                 <RowDefinition />
                 <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
-             
-                
+
             <c1:FlexGrid x:Name="fgridTagValues" 
                          ItemsSource="{Binding TagDataPoints}"
                          SelectionChanged="fgridTagValues_SelectionChanged"
-                         SelectionMode="Row"
+                         SelectionMode="RowRange"
                          Margin="3"
                          AutoGenerateColumns="False"     
                          HeadersVisibility="Column" 
                          DefaultRowHeight="Auto"             
                          ColumnHeaderForeground="White" 
-                         ColumnHeaderBackground="Black"
-                >   
+                         ColumnHeaderBackground="Black" 
+                         ShowSelectionMenu="False" 
+                         
+                         MouseRightButtonUp="fgridTagValues_MouseRightButtonUp" 
+                         
+                >
+                
                 <c1:FlexGrid.MouseOverBrush>
                     <SolidColorBrush Color="#FFFFFFFF" Opacity="0.15"/>
                 </c1:FlexGrid.MouseOverBrush>
@@ -116,13 +123,15 @@
 
                 <c1:FlexGrid.Columns>
 
-                    <c1:GridColumn Binding="TimestampLocal" IsReadOnly="True" Width="auto" Header="Timestamp"/>
-                    <c1:GridColumn Binding="TagValueString" IsReadOnly="True" Width="auto"/>
-                    <c1:GridColumn Binding="TagQuality" IsReadOnly="True" Width="auto"/>
+                    <c1:GridColumn Binding="TimestampLocal" IsReadOnly="True" Width="auto" Header="Timestamp (Local)"/>
+                    <c1:GridColumn Binding="TagValueString" IsReadOnly="True" Width="auto" Header="Value"/>
+                    <c1:GridColumn Binding="TagQuality" IsReadOnly="True" Width="auto" Header="Quality"/>
                     <c1:GridColumn Binding="TimestampUTC" IsReadOnly="True" Width="auto" Header="Timestamp (UTC)"/>
 
                 </c1:FlexGrid.Columns>
+
                 
+
             </c1:FlexGrid>
 
             <Grid Grid.Row="1" HorizontalAlignment="Center">
@@ -131,7 +140,7 @@
                     <ColumnDefinition Width="auto" />
                 </Grid.ColumnDefinitions>
                 <Button x:Name="btnDeleteSelectedTagValues" Grid.Column="0" Content="Delete Selected Data" Margin="3" Style="{DynamicResource RoundButton}" Click="btnDeleteSelectedTagValues_Click" IsEnabled="{Binding IsButtonsAreEnabled}" />
-                <Button x:Name="btnDeleteTagValuesInTimeRange" Grid.Column="1" Content="Delete Time Range" Margin="3" Style="{DynamicResource RoundButton}"  IsEnabled="{Binding IsButtonsAreEnabled}" Click="btnDeleteTagValuesInTimeRange_Click" />
+                <Button x:Name="btnDeleteTagValuesInTimeRange" Grid.Column="1" Content="Delete Time Range" Margin="3" Style="{DynamicResource RoundButton}" IsEnabled="{Binding IsButtonsAreEnabled}" Click="btnDeleteTagValuesInTimeRange_Click" />
             </Grid>
 
             <Border Grid.Column="1" BorderThickness="1" BorderBrush="Black" Margin="3">
@@ -161,8 +170,17 @@
                             <RowDefinition />
                         </Grid.RowDefinitions>
 
+                        
                         <TextBlock Text="Timestamp:" Margin="3" VerticalAlignment="Center" FontWeight="Bold"  />
-                        <c1:C1DateTimePicker Grid.Column="3" Margin="3" DateTime="{Binding DataWriteTimestamp, Mode=TwoWay}"/>
+                        <Grid Grid.Column="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition Width="auto"/>
+                            </Grid.ColumnDefinitions>
+                            <c1:C1DateTimePicker  Margin="3" DateTime="{Binding DataWriteTimestamp, Mode=TwoWay}"/>
+                            <Button Grid.Column="1" x:Name="btnSetWriteDataPointTimeToNow" Content="Now" Margin="3" Style="{DynamicResource RoundButton}" Click="btnSetWriteDataPointTimeToNow_Click" />
+                        </Grid>
+                        
                         
                         <TextBlock Grid.Row="1" Text="Timestamp (UTC):" Margin="3" VerticalAlignment="Center" FontWeight="Bold"  />
                         <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding DataWriteTimestampUTC}" TextAlignment="Center" Margin="3" VerticalAlignment="Center" FontWeight="Bold"  />

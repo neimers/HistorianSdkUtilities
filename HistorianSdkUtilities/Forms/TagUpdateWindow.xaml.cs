@@ -1,4 +1,5 @@
 ﻿using C1.WPF.Grid;
+using C1.WPF.Menu;
 using dataPARC.Store.EnterpriseCore.DataPoints;
 using HistorianSdkUtilities.Model;
 using System;
@@ -85,6 +86,64 @@ namespace HistorianSdkUtilities.Forms
         {
             await _vm.DeleteSelectedTagDataRangeAsync();
             await _vm.FetchTagDataAsync();
+        }
+
+        private void btnSetWriteDataPointTimeToNow_Click(object sender, RoutedEventArgs e)
+        {
+            _vm.DataWriteTimestamp = DateTime.Now;
+        }    
+
+        private void fgridTagValues_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            try
+            {
+                
+                GridHitTestInfo hitTest = fgridTagValues.HitTest(e);
+
+                int row = hitTest.Row;
+                int col = hitTest.Column;
+
+                if(hitTest.CellType == GridCellType.Cell)
+                {
+                    _vm.selectedTagDataPoints ??= [];
+
+                    _vm.selectedTagDataPoints.Clear();
+
+                    _vm.selectedTagDataPoints.Add((BindableTagDataPoint)fgridTagValues.Rows[row].DataItem);
+
+                    _vm.NotifySelectedTagDataPointsUpdated();
+
+                    fgridTagValues.Select(row, 0);
+
+                    var contextMenu = new C1ContextMenu();
+                    C1MenuItem c1MenuItem = new C1MenuItem();
+
+                    c1MenuItem.Header = "Set Data Point as Write Target";
+
+                    c1MenuItem.Click += (s, e) =>
+                    {
+                        if (_vm.SelectedTagDataPoints != null && _vm.SelectedTagDataPoints.Count > 0)
+                        {
+                            _vm.DataWriteTimestamp = _vm.SelectedTagDataPoints[0].TimestampLocal;
+                            _vm.DataWriteValue = _vm.SelectedTagDataPoints[0]?.DataPoint?.Value;
+                            _vm.DataWriteQuality = _vm.SelectedTagDataPoints[0]?.DataPoint?.Quality;
+                        }
+                        else
+                        {
+                            MessageBox.Show("nothing selected");
+                        }
+                    };
+
+                    contextMenu.Items.Add(c1MenuItem);
+
+                    contextMenu.Show(e.OriginalSource as FrameworkElement);
+                }
+                
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }            
         }
     }
 }
