@@ -30,8 +30,13 @@ namespace HistorianSdkUtilities.Model
         private int _port;
         public int Port
         {
-            get { return _port; }
-            set { _port = value; OnPropertyChanged(); Save_Settings(); }
+            get 
+            { 
+                return _port; 
+            }
+            set 
+            { _port = value; OnPropertyChanged(); Save_Settings(); 
+            }
         }
 
         public MainViewModel() 
@@ -45,6 +50,9 @@ namespace HistorianSdkUtilities.Model
 
             IsTestConnectPending = false;
             IsTagFetchPending = false;
+
+            _displayedInterfaceConfigs = new ObservableCollection<InterfaceConfig>();
+            _interfaceConfigs = new ObservableCollection<InterfaceConfig>();
 
             Load_Settings();
         } 
@@ -62,9 +70,9 @@ namespace HistorianSdkUtilities.Model
                 Settings.Default.HistorianPort = _port;
                 Settings.Default.Save();
             }
-            catch
+            catch(Exception ex)
             {
-
+                MessageBox.Show("Unable to update default settings, error: " + ex.Message);
             }            
         }
 
@@ -83,7 +91,59 @@ namespace HistorianSdkUtilities.Model
         }
 
         public ObservableCollection<InterfaceGroupConfig> InterfaceGroups { get; set; }
-        public ObservableCollection<InterfaceConfig> InterfaceConfigs { get; set; }
+
+        public ObservableCollection<InterfaceConfig> _interfaceConfigs;
+        public ObservableCollection<InterfaceConfig> InterfaceConfigs 
+        { 
+            get
+            {  return _interfaceConfigs; }
+            set
+            {
+                _interfaceConfigs = value;
+                OnPropertyChanged();
+
+                UpdateDisplayedInterfaceConfigs();                
+            }
+        }
+
+        private void UpdateDisplayedInterfaceConfigs()
+        {
+            if (_displayedInterfaceConfigs == null)
+            {
+                _displayedInterfaceConfigs = new ObservableCollection<InterfaceConfig>();
+            }
+
+            _displayedInterfaceConfigs?.Clear();
+
+            if (InterfaceGroups != null && SelectedInterfaceGroupConfig != null)
+            {
+                foreach (InterfaceConfig config in InterfaceConfigs)
+                {
+                    if (config.GroupId == SelectedInterfaceGroupConfig.Id)
+                    {
+                        _displayedInterfaceConfigs?.Add(config);
+                    }
+                }
+                
+                if(_displayedInterfaceConfigs == null || _displayedInterfaceConfigs.Count == 0 || SelectedInterfaceGroupConfig == null || (SelectedInterfaceConfig != null && SelectedInterfaceGroupConfig != null && SelectedInterfaceConfig.GroupId != SelectedInterfaceGroupConfig.Id))
+                {
+                    SelectedInterfaceConfig = null;
+                }
+
+                if (SelectedInterfaceConfig == null && SelectedInterfaceGroupConfig != null && _displayedInterfaceConfigs != null && _displayedInterfaceConfigs.Count > 0)
+                {
+                    SelectedInterfaceConfig = _displayedInterfaceConfigs[0];
+                }
+            }
+            else
+            {
+                SelectedInterfaceConfig = null;
+            }            
+
+            OnPropertyChanged("DisplayedInterfaceConfigs");
+            OnPropertyChanged("SelectedInterfaceConfig");
+        }
+
         public ObservableCollection<TagConfig> TagConfigs { get; set; }
         private TagConfig? _tagConfig { get; set; }
         public TagConfig? SelectedTagConfig
@@ -109,7 +169,11 @@ namespace HistorianSdkUtilities.Model
             }
             set
             {
-                _selectedInterfaceGroupConfig = value; OnPropertyChanged();
+                _selectedInterfaceGroupConfig = value; 
+                OnPropertyChanged();
+                OnPropertyChanged("DisplayedInterfaceConfigs");
+
+                UpdateDisplayedInterfaceConfigs();
             } 
         }
         private InterfaceConfig? _selectedInterfaceConfig;
@@ -125,7 +189,17 @@ namespace HistorianSdkUtilities.Model
                 OnPropertyChanged();
                 OnPropertyChanged("IsTagFetchButtonEnabled");
             }
-        }        
+        }
+
+
+        private ObservableCollection<InterfaceConfig>? _displayedInterfaceConfigs;
+        public ObservableCollection<InterfaceConfig>? DisplayedInterfaceConfigs 
+        { 
+            get 
+            {                
+                return _displayedInterfaceConfigs;
+            }
+        }
 
         public async Task TestConnectionToHistorianAndGetInterfacesAsync()
         {
@@ -182,7 +256,9 @@ namespace HistorianSdkUtilities.Model
                 {
                     MessageBox.Show("Failed to return interface groups, check server connection information and ensure server is reachable...");
                     connected = false;
-                }                               
+                }
+
+                UpdateDisplayedInterfaceConfigs();
 
                 IsConnected = connected;                
             }

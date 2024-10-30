@@ -63,7 +63,7 @@
             <TextBlock Text="Interface Group: " TextAlignment="Right" VerticalAlignment="Center" Margin="3"/>
             <ComboBox Grid.Column="1" Margin="3" ItemsSource="{Binding InterfaceGroups}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedInterfaceGroupConfig, Mode=TwoWay}" VerticalContentAlignment="Center" />
             <TextBlock Grid.Column="2" Text="Interface: " TextAlignment="Right" VerticalAlignment="Center" Margin="3"/>
-            <ComboBox Grid.Column="3" Margin="3" ItemsSource="{Binding InterfaceConfigs}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedInterfaceConfig, Mode=TwoWay}" VerticalContentAlignment="Center" />
+            <ComboBox Grid.Column="3" Margin="3" ItemsSource="{Binding DisplayedInterfaceConfigs}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedInterfaceConfig, Mode=TwoWay}" VerticalContentAlignment="Center" />
         </Grid>
 
         <Grid Grid.Row="2">
