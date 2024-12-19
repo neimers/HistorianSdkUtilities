@@ -73,9 +73,9 @@
                 <RowDefinition />
             </Grid.RowDefinitions>
             <TextBlock Text="Read Start Time:" VerticalAlignment="Center" Margin="3" FontWeight="Bold" />
-            <c1:C1DateTimePicker Grid.Column="1" Margin="3" DateTime="{Binding ReadStartTime, Mode=TwoWay}" />
+            <c1:C1DateTimePicker Grid.Column="1" Margin="3" DateTime="{Binding ReadStartTime, Mode=TwoWay}" CustomTimeFormat="HH:mm:ss" />
             <TextBlock Grid.Column="2" Text="Read End Time:" VerticalAlignment="Center" Margin="3" FontWeight="Bold" />
-            <c1:C1DateTimePicker Grid.Column="3" Margin="3" DateTime="{Binding ReadEndTime, Mode=TwoWay}" IsEnabled="{Binding IsReadEndTimeDatePickerEnabled}"/>
+            <c1:C1DateTimePicker Grid.Column="3" Margin="3" DateTime="{Binding ReadEndTime, Mode=TwoWay}" IsEnabled="{Binding IsReadEndTimeDatePickerEnabled}" CustomTimeFormat="HH:mm:ss"/>
 
             <CheckBox Grid.Row="0" Grid.Column="4" Content="Read To Now" VerticalAlignment="Center" IsChecked="{Binding IsReadToNowForEndTime, Mode=TwoWay}" />
 
@@ -177,7 +177,7 @@
                                 <ColumnDefinition />
                                 <ColumnDefinition Width="auto"/>
                             </Grid.ColumnDefinitions>
-                            <c1:C1DateTimePicker  Margin="3" DateTime="{Binding DataWriteTimestamp, Mode=TwoWay}"/>
+                            <c1:C1DateTimePicker  Margin="3" DateTime="{Binding DataWriteTimestamp, Mode=TwoWay}" CustomTimeFormat="HH:mm:ss"/>
                             <Button Grid.Column="1" x:Name="btnSetWriteDataPointTimeToNow" Content="Now" Margin="3" Style="{DynamicResource RoundButton}" Click="btnSetWriteDataPointTimeToNow_Click" />
                         </Grid>
                         
