@@ -8,5 +8,20 @@
     <Setting Name="HistorianPort" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">12340</Value>
     </Setting>
+    <Setting Name="FlatCsvTagColumnNumber" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">1</Value>
+    </Setting>
+    <Setting Name="FlatCsvTimestampColumnNumber" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">2</Value>
+    </Setting>
+    <Setting Name="FlatCsvValueColumnNumber" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">3</Value>
+    </Setting>
+    <Setting Name="FlatCsvQualityColumnNumber" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">4</Value>
+    </Setting>
+    <Setting Name="FlatCsvStartRowNumber" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">2</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

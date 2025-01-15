@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="C1.Excel" Version="8.0.20242.100" />
     <PackageReference Include="C1.WPF.Chart" Version="8.0.20242.966" />
     <PackageReference Include="C1.WPF.DateTimeEditors" Version="8.0.20242.966" />
     <PackageReference Include="C1.WPF.Grid" Version="8.0.20242.966" />

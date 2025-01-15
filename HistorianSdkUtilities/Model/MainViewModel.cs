@@ -90,6 +90,20 @@ namespace HistorianSdkUtilities.Model
             }
         }
 
+        public void LaunchInterfaceFileBackfillWindow()
+        {
+            if (SelectedInterfaceConfig != null)
+            {
+                InterfaceFileBackfillViewModel interfaceFileBackfillViewModel = new InterfaceFileBackfillViewModel(SelectedInterfaceConfig, HostName, Port);
+                InterfaceFileBackfillWindow win = new InterfaceFileBackfillWindow(interfaceFileBackfillViewModel);
+                win.Show();
+            }
+            else
+            {
+                MessageBox.Show("No interface currently selected.");
+            }
+        }
+
         public ObservableCollection<InterfaceGroupConfig> InterfaceGroups { get; set; }
 
         public ObservableCollection<InterfaceConfig> _interfaceConfigs;
@@ -142,6 +156,7 @@ namespace HistorianSdkUtilities.Model
 
             OnPropertyChanged("DisplayedInterfaceConfigs");
             OnPropertyChanged("SelectedInterfaceConfig");
+            OnPropertyChanged("IsInterfaceFileBackfillButtonEnabled");
         }
 
         public ObservableCollection<TagConfig> TagConfigs { get; set; }
@@ -176,6 +191,7 @@ namespace HistorianSdkUtilities.Model
                 UpdateDisplayedInterfaceConfigs();
             } 
         }
+
         private InterfaceConfig? _selectedInterfaceConfig;
         public InterfaceConfig? SelectedInterfaceConfig 
         {
@@ -188,6 +204,7 @@ namespace HistorianSdkUtilities.Model
                 _selectedInterfaceConfig = value; 
                 OnPropertyChanged();
                 OnPropertyChanged("IsTagFetchButtonEnabled");
+                OnPropertyChanged("IsInterfaceFileBackfillButtonEnabled");
             }
         }
 
@@ -335,6 +352,14 @@ namespace HistorianSdkUtilities.Model
             }
         }
 
+        public bool IsInterfaceFileBackfillButtonEnabled
+        {
+            get
+            {
+                return IsButtonsEnabled && (SelectedInterfaceConfig != null);
+            }
+        }
+
         public bool IsLaunchTagWindowButtonEnabled
         {
             get
@@ -356,6 +381,7 @@ namespace HistorianSdkUtilities.Model
                     OnPropertyChanged("IsButtonsEnabled");
                     OnPropertyChanged("IsTagFetchButtonEnabled");
                     OnPropertyChanged("IsLaunchTagWindowButtonEnabled");
+                    OnPropertyChanged("IsInterfaceFileBackfillButtonEnabled");
                 }
             }
         }
@@ -373,6 +399,7 @@ namespace HistorianSdkUtilities.Model
                     OnPropertyChanged("IsButtonsEnabled");
                     OnPropertyChanged("IsTagFetchButtonEnabled");
                     OnPropertyChanged("IsLaunchTagWindowButtonEnabled");
+                    OnPropertyChanged("IsInterfaceFileBackfillButtonEnabled");
                 }
             }
         }        

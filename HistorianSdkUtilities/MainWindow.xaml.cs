@@ -73,5 +73,10 @@ namespace HistorianSdkUtilities
         {
             await _vm.TestConnectionToHistorianAndGetInterfacesAsync();
         }
+
+        private void btnImportBackfillFileWindow_Click(object sender, RoutedEventArgs e)
+        {
+            _vm.LaunchInterfaceFileBackfillWindow();
+        }
     }
 }
