@@ -228,9 +228,7 @@ namespace HistorianSdkUtilities.Model
                 return;
             }
 
-            List<ITagDataPoint> tagDataPoints = new List<ITagDataPoint>();
-
-            List<Task> WriteTasks = new List<Task>();
+            List<ITagDataPoint> tagDataPoints = new List<ITagDataPoint>();            
 
             await using var client = new WriteClient(HostName, Port, CertificateValidation.AcceptAllCertificates);
             
@@ -243,7 +241,6 @@ namespace HistorianSdkUtilities.Model
                     if(kvp.Value.ValidBackfillPoint && kvp.Value.StoreTagDataPoint != null)
                     {
                         tagDataPoints.Add(kvp.Value.StoreTagDataPoint);
-                        //WriteTasks.Add(client.WriteDataPointAsync(kvp.Value.StoreTagDataPoint, true));
                     }
                 }
             }
@@ -252,12 +249,12 @@ namespace HistorianSdkUtilities.Model
 
             WriteDataResult result = await client.WriteDataPointSetAsync(dpSet, true);
 
-            MessageBox.Show("Recieved " + result.NumPointsReceived.ToString() + " points, " + result.NumFailedPoints.ToString() + " failed to write.");
+            JobStatus = "Recieved " + result.NumPointsReceived.ToString() + " points, " + result.NumFailedPoints.ToString() + " failed to write.";
         }
 
         public async Task LoadSkinnyDataFileAsync()
         {
-            // these are all zero based
+            // these are all zero based, but don't want the user to have to set it that way, so subtract zero off everything
             int tagCol = TagColumnNumber - 1;
             int tstampCol = TimestampColumnNumber - 1;
             int valCol = ValueColumnNumber - 1;
@@ -343,94 +340,142 @@ namespace HistorianSdkUtilities.Model
                                     backfillDataPoint.LocalTimestamp = tstamp;
                                     backfillDataPoint.UtcTimestamp = TimeZoneInfo.ConvertTimeToUtc(tstamp, InputDataTimeZoneInfo);
 
-                                    if(qualCol >= 0 && sheet[x, qualCol] != null && !string.IsNullOrWhiteSpace(sheet[x, qualCol].Value.ToString()))
+                                    try
                                     {
-                                        qualCode = Convert.ToInt16(sheet[x, qualCol].Value.ToString());
+                                        eQualityInputMode mode = SelectedQualityInputMode.Key;
 
-                                        if (qualCode >= 192)
+                                        if (mode == eQualityInputMode.AllGood)
                                         {
                                             quality = Quality.Good;
                                         }
-                                        else if(qualCode >= 64)
+                                        else if (qualCol >= 0)
                                         {
-                                            quality = Quality.Uncertain;
+                                            if(mode == eQualityInputMode.OpcDa) 
+                                            {
+                                                qualCode = Convert.ToInt16(sheet[x, qualCol].Value.ToString());
+
+                                                if (qualCode >= 192)
+                                                {
+                                                    quality = Quality.Good;
+                                                }
+                                                else if (qualCode >= 64)
+                                                {
+                                                    quality = Quality.Uncertain;
+                                                }
+                                                else
+                                                {
+                                                    quality = Quality.Bad;
+                                                }
+                                            }
+                                            else if (mode == eQualityInputMode.BitOneIsGood || mode == eQualityInputMode.BitOneIsBad)
+                                            {
+                                                qualCode = Convert.ToInt16(sheet[x, qualCol].Value.ToString());
+
+                                                if((mode == eQualityInputMode.BitOneIsGood && qualCode > 0) || (mode == eQualityInputMode.BitOneIsBad && qualCode < 1))
+                                                {
+                                                    quality = Quality.Good;
+                                                }
+                                                else
+                                                {
+                                                    quality = Quality.Bad;
+                                                }
+                                            }
+                                            else if (mode == eQualityInputMode.BooleanTrueIsGood || mode == eQualityInputMode.BooleanTrueIsBad)
+                                            {
+                                                bool bn = Convert.ToBoolean(sheet[x, qualCol].Value.ToString());
+
+                                                if((mode == eQualityInputMode.BooleanTrueIsGood && bn) || (mode == eQualityInputMode.BooleanTrueIsBad && !bn))
+                                                {
+                                                    quality = Quality.Good;
+                                                }
+                                                else
+                                                {
+                                                    quality = Quality.Bad;
+                                                }
+                                            }
+                                            else
+                                            {
+                                                // shouldn't ever get here, but just in case
+                                                quality = Quality.Bad;
+                                            }
+                                            
                                         }
                                         else
                                         {
-                                            quality = Quality.Bad;
+                                            quality = Quality.Good;
                                         }
-                                    }
-                                    else
-                                    {
-                                        quality = Quality.Good;
-                                    }
 
-                                    if (!tagDic[tagName].BackfillPoints.ContainsKey(tstamp))
-                                    {
-                                        tagDic[tagName].BackfillPoints.Add(tstamp, backfillDataPoint);
-                                    }
-                                    else
-                                    {
-                                        tagDic[tagName].DuplicateTimestampCount++;
-                                    }
-
-                                    try
-                                    {
-                                        switch (tag?.DataType)
+                                        if (!tagDic[tagName].BackfillPoints.ContainsKey(tstamp))
                                         {
-                                            case dataPARC.TimeSeries.Core.Enums.ValueType.Boolean:
-                                                dp = new dataPARC.Store.EnterpriseCore.TagDataPoints.TagDataPointBoolean(tag.Id, backfillDataPoint.UtcTimestamp.Value, quality, true, Convert.ToBoolean(dataWriteValue));
-                                                break;
-                                            case dataPARC.TimeSeries.Core.Enums.ValueType.Byte:
-                                                dp = new dataPARC.Store.EnterpriseCore.TagDataPoints.TagDataPointByte(tag.Id, backfillDataPoint.UtcTimestamp.Value, quality, true, Convert.ToByte(dataWriteValue));
-                                                break;
-                                            case dataPARC.TimeSeries.Core.Enums.ValueType.DateTime:
-                                                dp = new dataPARC.Store.EnterpriseCore.TagDataPoints.TagDataPointDateTime(tag.Id, backfillDataPoint.UtcTimestamp.Value, quality, true, Convert.ToDateTime(dataWriteValue));
-                                                break;
-                                            case dataPARC.TimeSeries.Core.Enums.ValueType.Decimal:
-                                                dp = new dataPARC.Store.EnterpriseCore.TagDataPoints.TagDataPointDecimal(tag.Id, backfillDataPoint.UtcTimestamp.Value, quality, true, Convert.ToDecimal(dataWriteValue));
-                                                break;
-                                            case dataPARC.TimeSeries.Core.Enums.ValueType.Double:
-                                                dp = new dataPARC.Store.EnterpriseCore.TagDataPoints.TagDataPointDouble(tag.Id, backfillDataPoint.UtcTimestamp.Value, quality, true, Convert.ToDouble(dataWriteValue));
-                                                break;
-                                            case dataPARC.TimeSeries.Core.Enums.ValueType.Int16:
-                                                dp = new dataPARC.Store.EnterpriseCore.TagDataPoints.TagDataPointInt16(tag.Id, backfillDataPoint.UtcTimestamp.Value, quality, true, Convert.ToInt16(dataWriteValue));
-                                                break;
-                                            case dataPARC.TimeSeries.Core.Enums.ValueType.Int32:
-                                                dp = new dataPARC.Store.EnterpriseCore.TagDataPoints.TagDataPointInt32(tag.Id, backfillDataPoint.UtcTimestamp.Value, quality, true, Convert.ToInt32(dataWriteValue));
-                                                break;
-                                            case dataPARC.TimeSeries.Core.Enums.ValueType.Int64:
-                                                dp = new dataPARC.Store.EnterpriseCore.TagDataPoints.TagDataPointInt64(tag.Id, backfillDataPoint.UtcTimestamp.Value, quality, true, Convert.ToInt64(dataWriteValue));
-                                                break;
-                                            case dataPARC.TimeSeries.Core.Enums.ValueType.SByte:
-                                                dp = new dataPARC.Store.EnterpriseCore.TagDataPoints.TagDataPointSByte(tag.Id, backfillDataPoint.UtcTimestamp.Value, quality, true, Convert.ToSByte(dataWriteValue));
-                                                break;
-                                            case dataPARC.TimeSeries.Core.Enums.ValueType.Single:
-                                                dp = new dataPARC.Store.EnterpriseCore.TagDataPoints.TagDataPointSingle(tag.Id, backfillDataPoint.UtcTimestamp.Value, quality, true, Convert.ToSingle(dataWriteValue));
-                                                break;
-                                            case dataPARC.TimeSeries.Core.Enums.ValueType.String:
-                                                dp = new dataPARC.Store.EnterpriseCore.TagDataPoints.TagDataPointString(tag.Id, backfillDataPoint.UtcTimestamp.Value, quality, true, Convert.ToString(dataWriteValue));
-                                                break;
-                                            case dataPARC.TimeSeries.Core.Enums.ValueType.UInt16:
-                                                dp = new dataPARC.Store.EnterpriseCore.TagDataPoints.TagDataPointUInt16(tag.Id, backfillDataPoint.UtcTimestamp.Value, quality, true, Convert.ToUInt16(dataWriteValue));
-                                                break;
-                                            case dataPARC.TimeSeries.Core.Enums.ValueType.UInt32:
-                                                dp = new dataPARC.Store.EnterpriseCore.TagDataPoints.TagDataPointUInt32(tag.Id, backfillDataPoint.UtcTimestamp.Value, quality, true, Convert.ToUInt32(dataWriteValue));
-                                                break;
-                                            case dataPARC.TimeSeries.Core.Enums.ValueType.UInt64:
-                                                dp = new dataPARC.Store.EnterpriseCore.TagDataPoints.TagDataPointUInt64(tag.Id, backfillDataPoint.UtcTimestamp.Value, quality, true, Convert.ToUInt64(dataWriteValue));
-                                                break;
+                                            tagDic[tagName].BackfillPoints.Add(tstamp, backfillDataPoint);
+                                        }
+                                        else
+                                        {
+                                            tagDic[tagName].DuplicateTimestampCount++;
                                         }
 
-                                        backfillDataPoint.StoreTagDataPoint = dp;
-                                        tagDic[tagName].ValidDataPointCount++;
-                                        backfillDataPoint.ValidBackfillPoint = true;
+                                        try
+                                        {
+                                            switch (tag?.DataType)
+                                            {
+                                                case dataPARC.TimeSeries.Core.Enums.ValueType.Boolean:
+                                                    dp = new dataPARC.Store.EnterpriseCore.TagDataPoints.TagDataPointBoolean(tag.Id, backfillDataPoint.UtcTimestamp.Value, quality, true, Convert.ToBoolean(dataWriteValue));
+                                                    break;
+                                                case dataPARC.TimeSeries.Core.Enums.ValueType.Byte:
+                                                    dp = new dataPARC.Store.EnterpriseCore.TagDataPoints.TagDataPointByte(tag.Id, backfillDataPoint.UtcTimestamp.Value, quality, true, Convert.ToByte(dataWriteValue));
+                                                    break;
+                                                case dataPARC.TimeSeries.Core.Enums.ValueType.DateTime:
+                                                    dp = new dataPARC.Store.EnterpriseCore.TagDataPoints.TagDataPointDateTime(tag.Id, backfillDataPoint.UtcTimestamp.Value, quality, true, Convert.ToDateTime(dataWriteValue));
+                                                    break;
+                                                case dataPARC.TimeSeries.Core.Enums.ValueType.Decimal:
+                                                    dp = new dataPARC.Store.EnterpriseCore.TagDataPoints.TagDataPointDecimal(tag.Id, backfillDataPoint.UtcTimestamp.Value, quality, true, Convert.ToDecimal(dataWriteValue));
+                                                    break;
+                                                case dataPARC.TimeSeries.Core.Enums.ValueType.Double:
+                                                    dp = new dataPARC.Store.EnterpriseCore.TagDataPoints.TagDataPointDouble(tag.Id, backfillDataPoint.UtcTimestamp.Value, quality, true, Convert.ToDouble(dataWriteValue));
+                                                    break;
+                                                case dataPARC.TimeSeries.Core.Enums.ValueType.Int16:
+                                                    dp = new dataPARC.Store.EnterpriseCore.TagDataPoints.TagDataPointInt16(tag.Id, backfillDataPoint.UtcTimestamp.Value, quality, true, Convert.ToInt16(dataWriteValue));
+                                                    break;
+                                                case dataPARC.TimeSeries.Core.Enums.ValueType.Int32:
+                                                    dp = new dataPARC.Store.EnterpriseCore.TagDataPoints.TagDataPointInt32(tag.Id, backfillDataPoint.UtcTimestamp.Value, quality, true, Convert.ToInt32(dataWriteValue));
+                                                    break;
+                                                case dataPARC.TimeSeries.Core.Enums.ValueType.Int64:
+                                                    dp = new dataPARC.Store.EnterpriseCore.TagDataPoints.TagDataPointInt64(tag.Id, backfillDataPoint.UtcTimestamp.Value, quality, true, Convert.ToInt64(dataWriteValue));
+                                                    break;
+                                                case dataPARC.TimeSeries.Core.Enums.ValueType.SByte:
+                                                    dp = new dataPARC.Store.EnterpriseCore.TagDataPoints.TagDataPointSByte(tag.Id, backfillDataPoint.UtcTimestamp.Value, quality, true, Convert.ToSByte(dataWriteValue));
+                                                    break;
+                                                case dataPARC.TimeSeries.Core.Enums.ValueType.Single:
+                                                    dp = new dataPARC.Store.EnterpriseCore.TagDataPoints.TagDataPointSingle(tag.Id, backfillDataPoint.UtcTimestamp.Value, quality, true, Convert.ToSingle(dataWriteValue));
+                                                    break;
+                                                case dataPARC.TimeSeries.Core.Enums.ValueType.String:
+                                                    dp = new dataPARC.Store.EnterpriseCore.TagDataPoints.TagDataPointString(tag.Id, backfillDataPoint.UtcTimestamp.Value, quality, true, Convert.ToString(dataWriteValue));
+                                                    break;
+                                                case dataPARC.TimeSeries.Core.Enums.ValueType.UInt16:
+                                                    dp = new dataPARC.Store.EnterpriseCore.TagDataPoints.TagDataPointUInt16(tag.Id, backfillDataPoint.UtcTimestamp.Value, quality, true, Convert.ToUInt16(dataWriteValue));
+                                                    break;
+                                                case dataPARC.TimeSeries.Core.Enums.ValueType.UInt32:
+                                                    dp = new dataPARC.Store.EnterpriseCore.TagDataPoints.TagDataPointUInt32(tag.Id, backfillDataPoint.UtcTimestamp.Value, quality, true, Convert.ToUInt32(dataWriteValue));
+                                                    break;
+                                                case dataPARC.TimeSeries.Core.Enums.ValueType.UInt64:
+                                                    dp = new dataPARC.Store.EnterpriseCore.TagDataPoints.TagDataPointUInt64(tag.Id, backfillDataPoint.UtcTimestamp.Value, quality, true, Convert.ToUInt64(dataWriteValue));
+                                                    break;
+                                            }
+
+                                            backfillDataPoint.StoreTagDataPoint = dp;
+                                            tagDic[tagName].ValidDataPointCount++;
+                                            backfillDataPoint.ValidBackfillPoint = true;
+                                        }
+                                        catch
+                                        {
+                                            // to do: maybe log errors with row number or something for inspection by user
+                                            tagDic[tagName].BadValueCount++;
+                                        }
                                     }
-                                    catch
+                                    catch 
                                     {
-                                        // to do: maybe log errors with row number or something for inspection by user
-                                        tagDic[tagName].BadValueCount++;
-                                    }
+                                        tagDic[tagName].BadQualityCount++;
+                                    }                                    
 
                                 }
                                 catch
@@ -462,6 +507,23 @@ namespace HistorianSdkUtilities.Model
             OnPropertyChanged("IsWriteDataButtonEnabled");
         }
 
+        private KeyValuePair<eQualityInputMode, string> _selectedQualityInputMode;
+        public KeyValuePair<eQualityInputMode,string> SelectedQualityInputMode
+        {
+            get { return _selectedQualityInputMode; }
+            set { _selectedQualityInputMode = value; OnPropertyChanged(); }
+        }
+
+        public Dictionary<eQualityInputMode, string> QualityInputModes { get; } =
+        new Dictionary<eQualityInputMode, string>()
+        {
+            {eQualityInputMode.OpcDa, "OPC DA Quality (>=192 Good, >=64 Uncertain, 0=Bad)"},
+            {eQualityInputMode.BooleanTrueIsBad, "Boolean Where True is Bad Quality"},
+            {eQualityInputMode.BooleanTrueIsGood, "Boolean Where True is Good Quality"},
+            {eQualityInputMode.BitOneIsGood, "1/0 Where 1 is Good"},
+            {eQualityInputMode.BitOneIsBad, "1/0 Where 0 is Good"},
+        };
+
         /// <summary>
         /// Load with dummy data, for design time use only.
         /// </summary>
@@ -479,9 +541,11 @@ namespace HistorianSdkUtilities.Model
 
             foreach (TimeZoneInfo tz in TimeZoneInfo.GetSystemTimeZones())
             {
-                AvailableTimeZones.Add(tz);
+                AvailableTimeZones.Add(tz);                
 
-                if(tz.Id == TimeZoneInfo.Local.Id)
+                // assume we probably want the time zone the source is set to be in most cases...
+                // will be a little annoying possibly for sources set to 'UTC' where data loaded in will be local though.
+                if (tz.Id.ToUpperInvariant() == TargetInterfaceConfig.Timezone.ToUpperInvariant())
                 {
                     InputDataTimeZoneInfo = tz;
                 }
@@ -508,7 +572,7 @@ namespace HistorianSdkUtilities.Model
             {
                 AvailableTimeZones.Add(tz);
 
-                if (tz.Id == TimeZoneInfo.Local.Id)
+                if (tz.Id.ToUpperInvariant() == TargetInterfaceConfig.Timezone.ToUpperInvariant())
                 {
                     InputDataTimeZoneInfo = tz;
                 }
@@ -535,6 +599,14 @@ namespace HistorianSdkUtilities.Model
             ValueColumnNumber = Settings.Default.FlatCsvValueColumnNumber;
             QualityColumnNumber = Settings.Default.FlatCsvQualityColumnNumber;
             StartRowNumber = Settings.Default.FlatCsvStartRowNumber;
+
+            foreach(KeyValuePair<eQualityInputMode, string> kvp in QualityInputModes)
+            {
+                if((int)kvp.Key == Settings.Default.FlatCsvQualityInputMode)
+                {
+                    SelectedQualityInputMode = kvp;
+                }
+            }
         }
         public void SaveUserCsvColumnAndRowSettings()
         {
@@ -545,6 +617,7 @@ namespace HistorianSdkUtilities.Model
                 Settings.Default.FlatCsvValueColumnNumber = ValueColumnNumber;
                 Settings.Default.FlatCsvQualityColumnNumber = QualityColumnNumber;
                 Settings.Default.FlatCsvStartRowNumber = StartRowNumber;
+                Settings.Default.FlatCsvQualityInputMode = (int)SelectedQualityInputMode.Key;
 
                 Settings.Default.Save();
             }

@@ -110,7 +110,7 @@ namespace HistorianSdkUtilities.Forms
             {
                 _vm.SaveUserCsvColumnAndRowSettings();
 
-                MessageBox.Show("Saved.");
+                MessageBox.Show("Saved settings to user profile.");
             }
             catch (Exception ex)
             {

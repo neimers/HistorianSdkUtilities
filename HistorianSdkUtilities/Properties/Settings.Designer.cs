@@ -106,5 +106,17 @@ namespace HistorianSdkUtilities.Properties {
                 this["FlatCsvStartRowNumber"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int FlatCsvQualityInputMode {
+            get {
+                return ((int)(this["FlatCsvQualityInputMode"]));
+            }
+            set {
+                this["FlatCsvQualityInputMode"] = value;
+            }
+        }
     }
 }

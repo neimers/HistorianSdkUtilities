@@ -7,7 +7,7 @@
         xmlns:c1="http://schemas.componentone.com/winfx/2006/xaml"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance d:Type=local:InterfaceFileBackfillViewModel, IsDesignTimeCreatable=True}"
-        Title="Interface File Backfill Window" Height="450" Width="800">
+        Title="Interface File Backfill Window" Height="600" Width="800">
     <Window.Resources>
         <Style TargetType="Button" x:Key="RoundButton">
             <Style.Resources>
@@ -49,7 +49,8 @@
             <TextBlock Grid.Column="3" Text="{Binding InterfaceId, FallbackValue=??}" Padding="0,5,0,5" TextAlignment="Left" VerticalAlignment="Center" Margin="0,3,0,3" FontStyle="Italic" />
             <TextBlock Grid.Column="4" Text=")" Padding="0,5,5,5" TextAlignment="Left" VerticalAlignment="Center" Margin="0,3,3,3" FontWeight="Bold" />
         </Grid>
-
+        
+        
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto"/>
@@ -64,45 +65,64 @@
             <Button x:Name="btnLoadDatafile" Grid.Column="3" Content="Load Backfill Data" MinWidth="35" Margin="5" Padding="5" Style="{DynamicResource RoundButton}"  IsEnabled="{Binding IsLoadDataButtonEnabled}" Click="btnLoadDatafile_Click" />
         </Grid>
 
-        <Grid Grid.Row="2">
-            <Grid.RowDefinitions>
-                <RowDefinition />
-                <RowDefinition />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="auto"/>
-                <ColumnDefinition Width="50" />
-                <ColumnDefinition Width="auto"/>
-                <ColumnDefinition Width="50"/>
-                <ColumnDefinition Width="auto"/>
-                <ColumnDefinition Width="50"/>
-                <ColumnDefinition Width="auto"/>
-                <ColumnDefinition Width="50"/>
-                <ColumnDefinition Width="auto"/>
-                <ColumnDefinition Width="50"/>
-                <ColumnDefinition Width="auto"/>
-            </Grid.ColumnDefinitions>
+        <Border Grid.Row="2" BorderBrush="Black" BorderThickness="1" CornerRadius="3" Margin="3">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="50" />
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="50"/>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="50"/>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="50"/>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="50"/>
+                    <ColumnDefinition Width="auto"/>
+                </Grid.ColumnDefinitions>
 
-            <TextBlock Grid.ColumnSpan="10" Text="Tag Column Settings" TextAlignment="Left" VerticalAlignment="Center" Margin="3" Padding="5" FontWeight="Bold"/>
+                <Grid Grid.ColumnSpan="10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto" />
+                        <ColumnDefinition Width="auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock  Text="Input File Configuration Settings" TextAlignment="Left" VerticalAlignment="Center" Margin="3" Padding="5" FontStyle="Italic"  FontWeight="Bold"/>
+                    <Button Grid.Column="1" x:Name="btnSaveColumnSettings" Content="Save Settings" MinWidth="35" Margin="3" Padding="5" Style="{DynamicResource RoundButton}"  IsEnabled="True" Click="btnSaveColumnSettings_Click"  />
+                </Grid>
+                
 
-            <TextBlock Grid.Row="1" Grid.Column="0" Text="Tag Name:" TextAlignment="Right" VerticalAlignment="Center" Margin="3" Padding="5" FontWeight="Bold"/>
-            <TextBox Grid.Row="1" Grid.Column="1" Padding="5" TextAlignment="Center" VerticalAlignment="Center" Margin="3" Text="{Binding Path=TagColumnNumber, UpdateSourceTrigger=PropertyChanged}" Style="{DynamicResource RoundTextBox}"/>
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="Tag Name:" TextAlignment="Right" VerticalAlignment="Center" Margin="3" Padding="5" FontWeight="Bold"/>
+                <TextBox Grid.Row="1" Grid.Column="1" Padding="5" TextAlignment="Center" VerticalAlignment="Center" Margin="3" Text="{Binding Path=TagColumnNumber, UpdateSourceTrigger=PropertyChanged}" Style="{DynamicResource RoundTextBox}"/>
 
-            <TextBlock Grid.Row="1" Grid.Column="2" Text="Timestamp:" TextAlignment="Right" VerticalAlignment="Center" Margin="3" Padding="5" FontWeight="Bold"/>
-            <TextBox Grid.Row="1" Grid.Column="3" Padding="5" TextAlignment="Center" VerticalAlignment="Center" Margin="3" Text="{Binding Path=TimestampColumnNumber, UpdateSourceTrigger=PropertyChanged}" Style="{DynamicResource RoundTextBox}"/>
+                <TextBlock Grid.Row="1" Grid.Column="2" Text="Timestamp:" TextAlignment="Right" VerticalAlignment="Center" Margin="3" Padding="5" FontWeight="Bold"/>
+                <TextBox Grid.Row="1" Grid.Column="3" Padding="5" TextAlignment="Center" VerticalAlignment="Center" Margin="3" Text="{Binding Path=TimestampColumnNumber, UpdateSourceTrigger=PropertyChanged}" Style="{DynamicResource RoundTextBox}"/>
 
-            <TextBlock Grid.Row="1" Grid.Column="4" Text="Value:" TextAlignment="Right" VerticalAlignment="Center" Margin="3" Padding="5" FontWeight="Bold"/>
-            <TextBox Grid.Row="1" Grid.Column="5" Padding="5" TextAlignment="Center" VerticalAlignment="Center" Margin="3" Text="{Binding Path=ValueColumnNumber, UpdateSourceTrigger=PropertyChanged}" Style="{DynamicResource RoundTextBox}"/>
+                <TextBlock Grid.Row="1" Grid.Column="4" Text="Value:" TextAlignment="Right" VerticalAlignment="Center" Margin="3" Padding="5" FontWeight="Bold"/>
+                <TextBox Grid.Row="1" Grid.Column="5" Padding="5" TextAlignment="Center" VerticalAlignment="Center" Margin="3" Text="{Binding Path=ValueColumnNumber, UpdateSourceTrigger=PropertyChanged}" Style="{DynamicResource RoundTextBox}"/>
 
-            <TextBlock Grid.Row="1" Grid.Column="6" Text="Quality:" TextAlignment="Right" VerticalAlignment="Center" Margin="3" Padding="5" FontWeight="Bold"/>
-            <TextBox Grid.Row="1" Grid.Column="7" Padding="5" TextAlignment="Center" VerticalAlignment="Center" Margin="3" Text="{Binding Path=QualityColumnNumber, UpdateSourceTrigger=PropertyChanged}" Style="{DynamicResource RoundTextBox}"/>
+                <TextBlock Grid.Row="1" Grid.Column="6" Text="Quality:" TextAlignment="Right" VerticalAlignment="Center" Margin="3" Padding="5" FontWeight="Bold"/>
+                <TextBox Grid.Row="1" Grid.Column="7" Padding="5" TextAlignment="Center" VerticalAlignment="Center" Margin="3" Text="{Binding Path=QualityColumnNumber, UpdateSourceTrigger=PropertyChanged}" Style="{DynamicResource RoundTextBox}"/>
 
-            <TextBlock Grid.Row="1" Grid.Column="8" Text="First Data Row:" TextAlignment="Right" VerticalAlignment="Center" Margin="3" Padding="5" FontWeight="Bold"/>
-            <TextBox Grid.Row="1" Grid.Column="9" Padding="5" TextAlignment="Center" VerticalAlignment="Center" Margin="3" Text="{Binding Path=StartRowNumber, UpdateSourceTrigger=PropertyChanged}" Style="{DynamicResource RoundTextBox}"/>
+                <TextBlock Grid.Row="1" Grid.Column="8" Text="First Data Row:" TextAlignment="Right" VerticalAlignment="Center" Margin="3" Padding="5" FontWeight="Bold"/>
+                <TextBox Grid.Row="1" Grid.Column="9" Padding="5" TextAlignment="Center" VerticalAlignment="Center" Margin="3" Text="{Binding Path=StartRowNumber, UpdateSourceTrigger=PropertyChanged}" Style="{DynamicResource RoundTextBox}"/>
 
-            <Button Grid.Row="1" Grid.Column="10" x:Name="btnSaveColumnSettings" Content="Save Settings" MinWidth="35" Margin="3" Padding="5" Style="{DynamicResource RoundButton}"  IsEnabled="True" Click="btnSaveColumnSettings_Click"  />
-
-        </Grid>
+                <Grid Grid.Row="2" Grid.ColumnSpan="10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto" />
+                        <ColumnDefinition Width="auto" />
+                    </Grid.ColumnDefinitions>
+                    
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Quality Type:" TextAlignment="Right" VerticalAlignment="Center" Margin="3" Padding="5" FontWeight="Bold"/>
+                    <ComboBox Grid.Column="1" MinWidth="250" Margin="3" Padding="5" ItemsSource="{Binding QualityInputModes}" DisplayMemberPath="Value" SelectedValue="{Binding SelectedQualityInputMode, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalContentAlignment="Center" />
+                </Grid>
+                
+            </Grid>
+        </Border>
 
         <Grid Grid.Row="3">
             <Grid.ColumnDefinitions>
@@ -125,7 +145,11 @@
                 DefaultRowHeight="Auto"             
                 ColumnHeaderForeground="White" 
                 ColumnHeaderBackground="Black" 
-                SelectionChanged="fgridTags_SelectionChanged"            
+                SelectionChanged="fgridTags_SelectionChanged"
+                BorderBrush="Black"
+                BorderThickness="1"
+                CornerRadius="3"
+                Margin="3"
                 >
                 <c1:FlexGrid.MouseOverBrush>
                     <SolidColorBrush Color="#FFFFFFFF" Opacity="0.15"/>
@@ -153,8 +177,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto" />
             </Grid.RowDefinitions>
-
-            <ProgressBar Value="{Binding PercentJobComplete, UpdateSourceTrigger=PropertyChanged}" Margin="3" Padding="5" />
+            
             <TextBlock Text="{Binding JobStatus}" TextAlignment="Center" Margin="3" Padding="5" />
         </Grid>
         

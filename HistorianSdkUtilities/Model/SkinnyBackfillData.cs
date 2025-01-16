@@ -21,6 +21,16 @@ namespace HistorianSdkUtilities.Model
         }
     }
 
+    public enum eQualityInputMode
+    {
+        OpcDa=0,
+        BooleanTrueIsGood=1,
+        BooleanTrueIsBad=2,
+        BitOneIsGood=3, 
+        BitOneIsBad=4,
+        AllGood=5
+    }
+
     public class BackfillTag : INotifyPropertyChanged
     {
         private TagConfig? _tag;
@@ -43,6 +53,7 @@ namespace HistorianSdkUtilities.Model
         public SortedList<DateTime, BackfillDataPoint> BackfillPoints { get; set; }
 
         public int BadValueCount { get; set; }
+        public int BadQualityCount { get; set; }
         public int BadTimestampCount { get; set; }
         public int DuplicateTimestampCount { get; set; }
         public int ValidDataPointCount { get; set; }
